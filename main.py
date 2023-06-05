@@ -3,8 +3,9 @@ from pydantic import BaseModel
 from constants import token, verify_token
 from bardapi import Bard
 import requests
-bard_token = 'XAif26RBGTVgAFIWf0aNCfqzDitizTRKcqB2ZuJJAqfAMJYfAWdnYtkwBV4DWIHKEovRAA.'
 
+bard_token = 'XAif26RBGTVgAFIWf0aNCfqzDitizTRKcqB2ZuJJAqfAMJYfAWdnYtkwBV4DWIHKEovRAA.'
+bard = Bard(token=bard_token)
 app = FastAPI()
 
 
@@ -43,8 +44,9 @@ async def receive_webhook(event: WebhookEvent):
             print("phone number id:", phon_no_id)
             print("from:", from_number)
             print("message body:", msg_body)
-            bard = Bard(token=bard_token)
+
             x = bard.get_answer(msg_body)['content']
+
             payload = {
                 "messaging_product": "whatsapp",
                 "to": from_number,
@@ -61,6 +63,12 @@ async def receive_webhook(event: WebhookEvent):
                 return Response(status_code=200)
 
     return Response(status_code=404)
+
+
+async def get_res(msg_body):
+    x = bard.get_answer(msg_body)['content']
+    print(x)
+    return x
 
 
 @app.get("/")
