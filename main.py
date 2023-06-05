@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel
-from constants import token, verify_token
+from constants import token, verify_token, bard_token
 from bardapi import Bard
 import requests
 
-bard_token = 'XAif26RBGTVgAFIWf0aNCfqzDitizTRKcqB2ZuJJAqfAMJYfAWdnYtkwBV4DWIHKEovRAA.'
+
 bard = Bard(token=bard_token)
 app = FastAPI()
 
@@ -46,6 +46,7 @@ async def receive_webhook(event: WebhookEvent):
             print("message body:", msg_body)
 
             x = bard.get_answer(msg_body)['content']
+            print(x)
 
             payload = {
                 "messaging_product": "whatsapp",
@@ -57,8 +58,7 @@ async def receive_webhook(event: WebhookEvent):
                 "Authorization": f"Bearer {token}",
             }
             url = f"https://graph.facebook.com/v17.0/{phon_no_id}/messages?access_token={token}"
-            response = requests.post(url, json=payload, headers=headers)
-
+            response = requests.post(url, data=payload, headers=headers)
             if response.ok:
                 return Response(status_code=200)
 
