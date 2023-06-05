@@ -3,8 +3,6 @@ from pydantic import BaseModel
 from constants import token, verify_token
 from bardapi import Bard
 import requests
-
-bard_token = 'XAif26RBGTVgAFIWf0aNCfqzDitizTRKcqB2ZuJJAqfAMJYfAWdnYtkwBV4DWIHKEovRAA.'
 bard = Bard(token=bard_token)
 app = FastAPI()
 
