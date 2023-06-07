@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel
-from constants import token, verify_token, bard_token
+import midjourney
+from constants import wa_token, verify_wa_token, bard_token
 from bardapi import Bard
 import requests
-
 
 bard = Bard(token=bard_token)
 app = FastAPI()
@@ -15,14 +15,16 @@ class WebhookEvent(BaseModel):
 
 
 @app.get("/webhook")
-async def verify_webhook(request: Request, challenge: str = None, token: str = None):
+async def verify_webhook(request: Request):
+    print("============")
     mode = request.query_params.get("hub.mode")
-    verify_wa_token = request.query_params.get("hub.verify_token")
+    verify_token = request.query_params.get("hub.verify_token")
     challenge = request.query_params.get("hub.challenge")
+    print(mode)
 
-    if mode and token:
-        if mode == "subscribe" and verify_wa_token == verify_token:
-            return challenge
+    if mode and wa_token:
+        if mode == "subscribe" and verify_token == verify_wa_token:
+            return Response(challenge, status_code=200)
 
     return Response(status_code=403)
 
@@ -44,31 +46,47 @@ async def receive_webhook(event: WebhookEvent):
             print("phone number id:", phon_no_id)
             print("from:", from_number)
             print("message body:", msg_body)
-
             x = bard.get_answer(msg_body)['content']
-            print(x)
+            # p = get_res()
 
             payload = {
                 "messaging_product": "whatsapp",
                 "to": from_number,
+                "status": "read",
                 "text": {"body": f"{x}"},
             }
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {token}",
+            datum = {
+                "messaging_product": "whatsapp",
+                "to": from_number,
+                "type": "template",
+                "template": {
+                    "name": "hello_world",
+                    "language": {
+                        "code": "en_US"
+                    }
+                }
             }
-            url = f"https://graph.facebook.com/v17.0/{phon_no_id}/messages?access_token={token}"
-            response = requests.post(url, data=payload, headers=headers)
+            header = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {wa_token}"
+            }
+            url = f"https://graph.facebook.com/v16.0/{phon_no_id}/messages"
+            print(url)
+            # url = "https://graph.facebook.com/v17.0/" + phon_no_id + "/messages"
+            response = requests.post(url, json=payload, headers=header)
             if response.ok:
                 return Response(status_code=200)
 
     return Response(status_code=404)
 
 
-async def get_res(msg_body):
-    x = bard.get_answer(msg_body)['content']
-    print(x)
-    return x
+def get_res():
+    client = midjourney.Client()
+    # Generate an image from a text prompt
+    prompt = "A cat sitting on a windowsill"
+    image = client.generate_image(prompt)
+    image.save("cat.png")
+    return
 
 
 @app.get("/")
