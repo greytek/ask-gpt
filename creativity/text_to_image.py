@@ -10,7 +10,7 @@ HEADERS = {
 }
 
 
-def send_task_to_dream_api(style_id, prompt, target_img_path=None):
+async def send_task_to_dream_api(style_id, prompt, target_img_path=None):
     """
     Send requests to the dream API.
     prompt is the text prompt.
