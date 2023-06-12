@@ -1,0 +1,37 @@
+version: '3'
+services:
+  app:
+    image: 304163933128.dkr.ecr.eu-north-1.amazonaws.com/ask-gpt:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_HOST=0.0.0.0
+#version: '3.8'
+#services:
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - db
+#
+#  db:
+#    image: mcr.microsoft.com/mssql/server:2022-latest
+#    ports:
+#      - "1433:1433"
+#    environment:
+#      - ACCEPT_EULA=Y
+#      - SA_PASSWORD=Qwerty123
+#      - MSSQL_DATABASE=wiremi-db
+#      - MSSQL_USER=sqladmin
+#      - MSSQL_PASSWORD=Qwerty123
+#      - MSSQL_SERVER=wiremi.database.windows.net
+#      - MSSQL_PORT=1433
+#
+#volumes:
+#  db_data:
